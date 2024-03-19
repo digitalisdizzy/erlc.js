@@ -4,8 +4,7 @@
 
 <img src="https://img.shields.io/npm/v/erlc.js?logo=npm&style=for-the-badge&labelColor=0091ff" alt="NPM Version Badge" style="display" />
 
-<a href="https://erlc.js.org"><img src="https://img.shields.io/badge/Read_the_Docs!-Click_here-blue?style=for-the-badge
-" alt="Read the docs here!" style="position:relative;" /></a>
+<a href="https://erlc.js.org"><img src="https://img.shields.io/badge/Read_the_Docs!-Click_here-blue?style=for-the-badge" alt="Read the docs here!" style="position:relative;" /></a>
 
 <a href="https://www.roblox.com/games/2534724415/Emergency-Response-Liberty-County"><img src="https://img.shields.io/badge/Play-ER%3ALC!-red?style=for-the-badge&logo=roblox&labelColor=blue" alt="Read the docs here!" style="position:relative;" /></a>
 
