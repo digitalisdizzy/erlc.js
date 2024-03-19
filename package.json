@@ -1,6 +1,6 @@
 {
   "name": "erlc.js",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "An extremely useful module for talking to the ER:LC API.",
   "main": "main.js",
   "scripts": {
@@ -15,6 +15,6 @@
   "homepage": "https://erlc.js.org/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/digitalisdizzy"
+    "url": "https://github.com/digitalisdizzy/erlc.js"
   }
 }
