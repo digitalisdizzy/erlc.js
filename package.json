@@ -1,0 +1,16 @@
+{
+  "name": "erlc.js",
+  "version": "1.0.4",
+  "description": "An extremely useful module for talking to the ER:LC API.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "digitalisdizzy",
+  "license": "Apache-2.0",
+  "keywords": [
+    "api",
+    "er:lc"
+  ],
+  "homepage": "https://erlc.js.org/"
+}
