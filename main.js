@@ -63,6 +63,99 @@ const Team = {
     DepartmentOfTransportation: "DOT"
 }
 
+/**
+ * Error statuses that may be returned from an API request
+ * @typedef {Object} HttpStatus
+ * @property {number} BadRequest 400: The request wasn't in the format the server requested.
+ * @property {number} Unauthorised 401: The client isn't authorised to make the request.
+ * @property {number} PaymentRequired 402: Payment is required to make the request. Very rarely used and meaning may change in the future.
+ * @property {number} Forbidden 403: The client is forbidden from making this request. Usually means that the Server key has been regenerated. Once this message has been received, you should cease to use this Server immediately in order to comply with the PRC API Guidelines.
+ * @property {number} NotFound 404: The content requested doesn't exist.
+ * @property {number} MethodNotAllowed 405: This method (GET, POST, HEAD, etc.) is not allowed on this endpoint.
+ * @property {number} NotAcceptable 406
+ * @property {number} ProxyAuthenticationRequired 407
+ * @property {number} Timeout 408: The server wants to shutdown the connection since it is unused.
+ * @property {number} Conflict 409: There is a conflict with the current state of the server.
+ * @property {number} Gone 410: This content no longer exists.
+ * @property {number} ContentLengthRequired 411: The request requires the "Content-Length" header but it was not given.
+ * @property {number} PreconditionFailed 412
+ * @property {number} PayloadTooLarge 413: The request entity is too large.
+ * @property {number} URITooLong 414: The URI (or URL) is too large to process.
+ * @property {number} UnsupportedMediaType 415: The media format is not supported by the server.
+ * @property {number} RangeNotSatisfiable 416
+ * @property {number} ExpectationFailed 417
+ * @property {number} Teapot 418: The server refuses to brew coffee with a teapot.
+ * @property {number} MisdirectedRequest 421
+ * @property {number} UnproccessableEntity 422: The entity given cannot be proccessed. Usually given if a command is sent to an empty Server.
+ * @property {number} Locked 423
+ * @property {number} FailedDependency 424
+ * @property {number} TooEarly 425: The server doesn't want to proccess a request that may be replayed.
+ * @property {number} UpgradeRequired 426
+ * @property {number} PreconditionRequired 428
+ * @property {number} Ratelimited 429: The server is getting too many requests from the client and has ratelimited it. Continuing to make requests whilst ratelimited may cause a temporary ban from the API.
+ * @property {number} HeaderFieldsTooLarge 431
+ * @property {number} Legal 451: This content is unavailable for legal reasons, such as government censorship.
+ * @property {number} InternalServerError 500: An internal server error has occured and the server cannot process the request. If this continues, check the Roblox Status.
+ * @property {number} NotImplemented 501
+ * @property {number} BadGateway 502
+ * @property {number} ServiceUnavailable 503: The API is currently unavailable.
+ * @property {number} GatewayTimeout 504
+ * @property {number} HTTPVersionNotSupported 505
+ * @property {number} VariantAlsoNegotiates 506
+ * @property {number} InsufficientStorage 507
+ * @property {number} LoopDetected 508: An infinite loop was detected whilst processing the request.
+ * @property {number} NotExtended 510
+ * @property {number} NetworkAuthenticationRequired 511
+ */
+
+
+/**
+ * @type {HttpStatus}
+ * @readonly
+ */
+const HttpStatus = {
+    "BadRequest": 400,
+    "Unauthorised": 401,
+    "PaymentRequired": 402,
+    "Forbidden": 403,
+    "NotFound": 404,
+    "MethodNotAllowed": 405,
+    "NotAcceptable": 406,
+    "ProxyAuthenticationRequired": 407,
+    "Timeout": 408,
+    "Conflict": 409,
+    "Gone": 410,
+    "ContentLengthRequired": 411,
+    "PreconditionFailed": 412,
+    "PayloadTooLarge": 413,
+    "URITooLong": 414,
+    "UnsupportedMediaType": 415,
+    "RangeNotSatisfiable": 416,
+    "ExpectationFailed": 417,
+    "Teapot": 418,
+    "MisdirectedRequest": 421,
+    "UnproccessableEntity": 422,
+    "Locked": 423,
+    "FailedDependency": 424,
+    "TooEarly": 425,
+    "UpgradeRequired": 426,
+    "PreconditionRequired": 428,
+    "Ratelimited": 429,
+    "HeaderFieldsTooLarge": 431,
+    "Legal": 451,
+    "InternalServerError": 500,
+    "NotImplemented": 501,
+    "BadGateway": 502,
+    "ServiceUnavailable": 503,
+    "GatewayTimeout": 504,
+    "HTTPVersionNotSupported": 505,
+    "VariantAlsoNegotiates": 506,
+    "InsufficientStorage": 507,
+    "LoopDetected": 508,
+    "NotExtended": 510,
+    "NetworkAuthenticationRequired": 511
+}
+
 const commandsThatAllowSpacesInArgs = [
     "log",
     "h",
@@ -70,6 +163,41 @@ const commandsThatAllowSpacesInArgs = [
     "m",
     "message" // excludes 'pm' purposefully
 ]
+
+const statusCodesToHumanReadableMessages = {
+    400: "The request wasn't in the format the server requested.",
+    403: "You aren't allowed to make this request. If using your own server key, check it is correct. If using somebody else's server key, it has likely been regenerated and you should immediately cease making requests using this Server to comply with PRC API Guidelines.",
+    404: "Endpoint not found. It may be temporarily down or might not exist. Double check the endpoint exists.",
+    405: "This endpoint does not  allow this method (GET, POST, HEAD, etc.). Check you are using the correct method.",
+    410: "This endpoint is permenantly deleted.",
+    413: "The payload given is too large and the server refuses to process it.",
+    418: "The server refuses to brew coffee with a teapot. This usually occurs when the server doesn't want to process this request. See more information here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/418",
+    422: "The request entity cannot be proccessed. This usually occurs when you attempt to send a command to an empty Server.",
+    429: "You are being ratelimited. Respect the retryAfter property of the APIError or you risk a temporary ban from the API.",
+    500: "Internal server error, you usually can't do anything to fix this and have to wait for the issue to be resolved. Retry the request. If you repeatedly get this error code, check the Roblox status.",
+    503: "The PRC API is unavailable.",
+    508: "The server detected an infinite loop whilst processing your request and shutdown the request to prevent any problems from occuring."
+}
+
+/**
+ * An object containing information about an API error
+ * @property {number} status The HTTP status for this response
+ * @property {string} humanReadableMessage A human readable message for this error. It is recommended not to share this with the user
+ * @property {number|null} retryAfter How long to wait before retrying the request. Null if not given by server.
+ * @property {Response} responseObject The Response object of the request that returned this error.
+ */
+class APIError{
+    /**
+     * Create an APIError object.
+     * @param {Response} response The API response
+     */
+    constructor(response){
+        this.status = response.status
+        this.humanReadableMessage = statusCodesToHumanReadableMessages[response.status] || `An error occured. See the Mozilla Documentation for this error code: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/${response.status}`
+        this.retryAfter = response.headers.get("Retry-After") * 1000000 || null
+        this.responseObject = response
+    }
+}
 
 /**
  * A Roblox user
@@ -198,7 +326,7 @@ class Server{
     /**
      * Create a Server object
      * @param {string} key The server API key
-     * @param {string} authorizationKey The authorization key, needed if you're using this for production (optional)
+     * @param {string} [authorizationKey] The authorization key, needed if you're using this for production (optional)
      * @returns {Server}
      */
     constructor(key, authorizationKey){
@@ -236,6 +364,7 @@ class Server{
     /**
     * Initiate this server.
     * @returns {Promise<Server>} The server that was initiated.
+    * @throws {APIError}
     * @example
     * const privateServer = new Server()
     * await privateServer.initiate()
@@ -270,12 +399,10 @@ class Server{
                         console.log("--------------------")
                     }
                 } else {
-                    errormessage("Could not initiate server: " + serverResponse.status + ": " + serverResponse.statusText)
-                    console.log("Could not initiate server: " + serverResponse.status + ": " + serverResponse.statusText)
+                    errormessage(new APIError(serverResponse))
                 }
             })).catch(error => {
-                console.error("Error initiating server:", error);
-                errormessage("Error initiating server: " + error);
+                errormessage(error);
             });
         }.bind(this));
     }
@@ -287,6 +414,7 @@ class Server{
     * @param {number} version The API version. Defaults to '1'.
     * @param {object} data The JSON data to be sent with the request
     * @returns {Promise<Response>}
+    * @throws {APIError}
     * @example
      * const privateServer = new Server()
      * await privateServer.initiate()
@@ -318,10 +446,10 @@ class Server{
                     if(response.ok){
                         success(response)
                     } else {
-                        errormessage(`Could not ${method} endpoint /v${version}${endpoint}: ${response.status} ${response.statusText}`)
+                        errormessage(new APIError(response))
                     }
                 }).catch(e => {
-                    errormessage(`Could not ${method} endpoint /v${version}${endpoint}: ${e}`)
+                    errormessage(new APIError(response))
                 })
             } else {
                 fetch(`https://api.policeroleplay.community/v${version}${endpoint}`, {
@@ -332,10 +460,10 @@ class Server{
                     if(response.ok){
                         success(response)
                     } else {
-                        errormessage(`Could not ${method} endpoint /v${version}${endpoint}: ${response.status} ${response.statusText}`)
+                        errormessage(new APIError(response))
                     }
                 }).catch(e => {
-                    errormessage(`Could not ${method} endpoint /v${version}${endpoint}: ${e}`)
+                    errormessage(new APIError(response))
                 })
             }
         }.bind(this))
@@ -352,6 +480,7 @@ class Server{
     /**
      * Get the join logs of the Server
      * @returns {JoinLog[]}
+     * @throws {APIError}
      */
     getJoinLogs(){
         return new Promise(function(success, errormessage){
@@ -369,7 +498,7 @@ class Server{
                 this.cache.joinLogs = newJoinLogs
                 success(newJoinLogs)
             }).catch(error => {
-                errormessage("Could not get join logs: " + error)
+                errormessage(error)
             })
         }.bind(this))
     }
@@ -377,6 +506,7 @@ class Server{
     /**
      * Get all Players in the Server
      * @returns {Promise<Player[]>} List of all online Players.
+     * @throws {APIError}
      * @example
      * const privateServer = new Server()
      * await privateServer.initiate()
@@ -393,7 +523,7 @@ class Server{
                 this.cache.players = newPlayers
                 success(newPlayers)
             })).catch(error => {
-                errormessage("Could not get players: " + error)
+                errormessage(error)
             })
         }.bind(this))
     }
@@ -401,6 +531,7 @@ class Server{
     /**
      * Get all players in the Server's queue by user ID
      * @returns {Promise<string[]>} List of all online Players.
+     * @throws {APIError}
      * @example
      * const privateServer = new Server()
      * await privateServer.initiate()
@@ -412,7 +543,7 @@ class Server{
                 success(data)
                 this.cache.joinLogs = data
             })).catch(error => {
-                errormessage("Could not get queue: " + error)
+                errormessage(error)
             })
         }.bind(this))
     }
@@ -427,6 +558,7 @@ class Server{
     /**
      * Get a list of the spawned vehicles in the Server
      * @returns {Vehicle[]}
+     * @throws {APIError}
      */
     getSpawnedVehicles(){
         return new Promise(function(success, errormessage){
@@ -443,10 +575,8 @@ class Server{
                 this.cache.vehicles = newVehicles
                 success(newVehicles)
             }).catch(error => {
-                errormessage("Could not get vehicles: " + error)
-            })).catch(error => {
-                errormessage("Could not get vehicles: " + error)
-            })
+                errormessage(error)
+            }))
         }.bind(this))
     }
 
@@ -462,6 +592,7 @@ class Server{
     /**
      * Get the moderation logs of this Server
      * @returns {Promise<ModerationLog[]>}
+     * @throws {APIError}
      * @example
      * const privateServer = new Server()
      * await privateServer.initiate()
@@ -504,7 +635,7 @@ class Server{
                 this.cache.moderationLogs = newModLogs
                 success(newModLogs)
             }).catch(error => {
-                errormessage("Could not get moderation logs: " + error)
+                errormessage(error)
             })
         }.bind(this))
     }
@@ -512,6 +643,7 @@ class Server{
     /**
      * Get the custom logs of this server (sent with :log)
      * @returns {Promise<ModerationLog[]>}
+     * @throws {APIError}
      * @example
      * const privateServer = new Server()
      * await privateServer.initiate()
@@ -549,7 +681,7 @@ class Server{
                 this.cache.moderationLogs = newModLogs
                 success(newModLogs.filter(item => item.command === "log"))
             }).catch(error => {
-                errormessage("Could not get custom logs: " + error)
+                errormessage(error)
             })
         }.bind(this))
     }
@@ -558,6 +690,7 @@ class Server{
      * Send a custom log to this Server
      * @param {string} text The text to log
      * @returns {Promise<Response>} The fetch response from the server
+     * @throws {APIError}
      * @example
      * // sends 'Hello World!' to the server logs
      * const privateServer = new Server()
@@ -571,7 +704,7 @@ class Server{
             }).then(response => {
                 success(response);
             }).catch(error => {
-                errormessage("Could not send log: " + error);
+                errormessage(error);
             });
         }.bind(this));
     }
@@ -588,6 +721,7 @@ class Server{
     /**
      * Get the kill logs of this Server
      * @returns {Promise<KillLog[]>}
+     * @throws {APIError}
      * @example
      * const privateServer = new Server()
      * await privateServer.initiate()
@@ -620,7 +754,7 @@ class Server{
                 this.cache.killLogs = newKillLogs
                 success(newKillLogs)
             }).catch(error => {
-                errormessage("Could not get kill logs: " + error)
+                errormessage(error)
             })
         }.bind(this))
     }
@@ -638,6 +772,7 @@ class Server{
     /**
      * Get the moderator calls for this Server (made with '!mod' or '!help')
      * @returns {Promise<ModeratorCall[]>}
+     * @throws {APIError}
      * @example
      * const privateServer = new Server()
      * await privateServer.initiate()
@@ -678,7 +813,7 @@ class Server{
                 this.cache.moderatorCalls = newModCalls
                 success(newModCalls)
             }).catch(error => {
-                errormessage("Could not get moderator calls: " + error)
+                errormessage(error)
             })
         }.bind(this))
     }
@@ -692,6 +827,7 @@ class Server{
     /**
      * Get the banned players from this Server
      * @returns {Promise<BannedPlayer[]>}
+     * @throws {APIError}
      * @example
      * const privateServer = new Server()
      * await privateServer.initiate()
@@ -718,7 +854,7 @@ class Server{
                 this.cache.bannedUsers = newBans
                 success(newBans)
             }).catch(error => {
-                errormessage("Could not get banned users: " + error)
+                errormessage(error)
             })
         }.bind(this))
     }
@@ -730,6 +866,7 @@ class Server{
      * @param {string} command The command to send, excluding ':'
      * @param {string[]} args An array of arguments to be sent with the command
      * @returns {Promise<Response>} The fetch response from the server
+     * @throws {APIError}
      * @example
      * // sends ':m Hello World!' to the Server
      * const privateServer = new Server()
@@ -743,7 +880,7 @@ class Server{
             }).then(response => {
                 success(response);
             }).catch(error => {
-                errormessage("Could not send command: " + error);
+                errormessage(error);
             });
         }.bind(this));
     }
@@ -753,8 +890,10 @@ module.exports = {
     User,
     Player,
     Server,
+    APIError,
     getUserFromUserID,
     AccountVerificationType,
     UserPermissionType,
-    Team
+    Team,
+    HttpStatus
 }
